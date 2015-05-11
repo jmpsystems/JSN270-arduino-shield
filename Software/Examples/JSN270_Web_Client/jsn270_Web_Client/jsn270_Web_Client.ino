@@ -4,8 +4,8 @@
 #include <SoftwareSerial.h>
 
 #define SSID      "PJW_2G"
-#define KEY       "12345"
-#define AUTH       "WEP" 
+#define KEY       "12345678"
+#define AUTH       "WPA2" 
 
 #define USE_DHCP_IP 1
 
@@ -15,7 +15,8 @@
 #define GATEWAY        "192.168.1.254"
 #endif
 
-#define SERVER_PORT    1234
+#define HOST_IP        "74,125,232,128"	// www.google.com
+#define REMOTE_PORT    80
 #define PROTOCOL       "TCP"
 
 SoftwareSerial mySerial(3, 2); // RX, TX
@@ -28,7 +29,7 @@ void setup() {
 	mySerial.begin(9600);
 	Serial.begin(9600);
 
-	Serial.println("--------- JSN270 TCP Server with WEP Test --------");
+	Serial.println("--------- JSN270 Web Client Test --------");
 
 	// wait for initilization of JSN270
 	delay(1000);
@@ -77,24 +78,27 @@ void setup() {
 
 	delay(1000);
 
-	if (!JSN270.server(SERVER_PORT, PROTOCOL)) {
-		Serial.println("Failed connect ");
+	if (!JSN270.client(HOST_IP, REMOTE_PORT, PROTOCOL)) {
+		Serial.println("Failed connect to " HOST_IP);
 		Serial.println("Restart System");
 	} else {
-		Serial.println("Waiting for connection...");
-		delay(1000);
-
+		Serial.println("Socket connect to " HOST_IP);
+		//delay(2000);
 		// Enter data mode
 		JSN270.sendCommand("at+exit\r");
-		delay(5);
+		delay(100);
+
+		Serial.println("connected to server");
+		// Make a HTTP request:
+		JSN270.println("GET /search?q=JSN270 HTTP/1.1");
+		JSN270.println("Host: www.google.com");
+		JSN270.println("Connection: close");
+		JSN270.println();
 	}
 }
 
 void loop() {
 	if(JSN270.available()) {
 		Serial.print((char)JSN270.read());
-	}
-	if(Serial.available()) {
-		JSN270.print((char)Serial.read());
 	}
 }

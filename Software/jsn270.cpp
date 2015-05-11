@@ -61,25 +61,6 @@ void JSN270::reset()
 
 void JSN270::prompt() {
 	sendCommand("at\r", "[OK]");
-	delay(1000);
-
-	wifi_led_off();
-	wifi_led_init();
-}
-
-void JSN270::wifi_led_init() {
-	sendCommand("at+gpiocfg=14,1\r", "[OK]");
-	delay(1000);
-}
-
-void JSN270::wifi_led_on() {
-	sendCommand("at+gpioset=14,0\r", "[OK]");
-	delay(1000);
-}
-
-void JSN270::wifi_led_off() {
-	sendCommand("at+gpioset=14,1\r", "[OK]");
-	delay(1000);
 }
 
 boolean JSN270::leave()
@@ -155,6 +136,23 @@ boolean JSN270::server(uint16_t localport, const char *protocol)
 	return false;
 }
 
+boolean JSN270::connected()
+{
+	boolean found = find("CONNECTED 0");
+	if (found) {
+		return true;
+	}
+	return false;
+}
+
+boolean JSN270::disconnect()
+{
+	if (sendCommand("at+nclose\r","[OK]")) {
+		return true;
+	}
+	return false;
+}
+
 boolean JSN270::join(const char *ssid, const char *phrase, const char *auth)
 {
 	char cmd[MAX_CMD_LEN];
@@ -175,13 +173,57 @@ boolean JSN270::join(const char *ssid, const char *phrase, const char *auth)
 
 	if (sendCommand("at+wstart\r", "[IP ACQUIRED]")) {
 		associated = true;
-		wifi_led_on();
 		return true;
 	}
 
 	return false;
 }
- 
+
+boolean JSN270::sendln(const char *data)
+{
+	char cmd[MAX_CMD_LEN];
+
+	// ssid
+	snprintf(cmd, MAX_CMD_LEN, "at+send=%s\r", data);
+	sendCommand(cmd,"[OK]");
+
+	return true;
+}
+
+boolean JSN270::senddata(const char *data)
+{
+	char cmd[MAX_CMD_LEN];
+
+	// ssid
+	snprintf(cmd, MAX_CMD_LEN, "at+sendb=%d\r", strlen(data));
+	send(cmd);
+	delay(10);
+	snprintf(cmd, MAX_CMD_LEN, "%c%c", 0x1B, 0x57);
+	send(cmd);
+	delay(10);
+	send(data);
+
+	return true;
+}
+
+boolean JSN270::senddata(int data)
+{
+	char str[MAX_CMD_LEN];
+	char cmd[MAX_CMD_LEN];
+
+	// ssid
+	snprintf(str, MAX_CMD_LEN, "%d", data);
+	snprintf(cmd, MAX_CMD_LEN, "at+sendb=%s\r", strlen(str));
+	send(cmd);
+	delay(10);
+	snprintf(cmd, MAX_CMD_LEN, "%c%c", 0x1B, 0x57);
+	send(cmd);
+	delay(10);
+	send(str);
+
+	return true;
+}
+
 int JSN270::send(const uint8_t *data, int len, int timeout)
 {
     int write_bytes = 0;

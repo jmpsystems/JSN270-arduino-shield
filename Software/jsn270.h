@@ -6,8 +6,8 @@
 #include <Stream.h>
 
 #define DEFAULT_WAIT_RESPONSE_TIME      15000         
-#define DEFAULT_BAUDRATE                115200
-#define MAX_CMD_LEN                     60
+#define DEFAULT_BAUDRATE                9600
+#define MAX_CMD_LEN                     256
 #define MAX_TRY_JOIN                    3
 
 class JSN270 : public Stream
@@ -22,25 +22,20 @@ public:
     virtual int read();
     virtual int peek();
     virtual void flush();
-
-    static JSN270 *getInstance() {
-        return instance;
-    }
-
-   
     void reset();
     void prompt();
-   
-    void wifi_led_init();
-    void wifi_led_on();
-    void wifi_led_off();
-	
+   	
     boolean leave();   
     boolean join(const char *ssid, const char *phrase, const char *auth);
     boolean staticIP(const char *ip, const char *mask, const char *gateway);
     boolean dynamicIP();
     boolean client(const char *host, uint16_t port, const char *protocol);
     boolean server(uint16_t localport, const char *protocol);
+    boolean connected();
+    boolean disconnect();
+	boolean sendln(const char *data);
+	boolean senddata(const char *data);
+	boolean senddata(int data);
  
     int send(const char *data, int timeout = DEFAULT_WAIT_RESPONSE_TIME);
     int send(const uint8_t *data, int len, int timeout = DEFAULT_WAIT_RESPONSE_TIME);
