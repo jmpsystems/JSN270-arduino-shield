@@ -179,51 +179,6 @@ boolean JSN270::join(const char *ssid, const char *phrase, const char *auth)
 	return false;
 }
 
-boolean JSN270::sendln(const char *data)
-{
-	char cmd[MAX_CMD_LEN];
-
-	// ssid
-	snprintf(cmd, MAX_CMD_LEN, "at+send=%s\r", data);
-	sendCommand(cmd,"[OK]");
-
-	return true;
-}
-
-boolean JSN270::senddata(const char *data)
-{
-	char cmd[MAX_CMD_LEN];
-
-	// ssid
-	snprintf(cmd, MAX_CMD_LEN, "at+sendb=%d\r", strlen(data));
-	send(cmd);
-	delay(10);
-	snprintf(cmd, MAX_CMD_LEN, "%c%c", 0x1B, 0x57);
-	send(cmd);
-	delay(10);
-	send(data);
-
-	return true;
-}
-
-boolean JSN270::senddata(int data)
-{
-	char str[MAX_CMD_LEN];
-	char cmd[MAX_CMD_LEN];
-
-	// ssid
-	snprintf(str, MAX_CMD_LEN, "%d", data);
-	snprintf(cmd, MAX_CMD_LEN, "at+sendb=%s\r", strlen(str));
-	send(cmd);
-	delay(10);
-	snprintf(cmd, MAX_CMD_LEN, "%c%c", 0x1B, 0x57);
-	send(cmd);
-	delay(10);
-	send(str);
-
-	return true;
-}
-
 int JSN270::send(const uint8_t *data, int len, int timeout)
 {
     int write_bytes = 0;

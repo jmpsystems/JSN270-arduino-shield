@@ -33,9 +33,6 @@ public:
     boolean server(uint16_t localport, const char *protocol);
     boolean connected();
     boolean disconnect();
-	boolean sendln(const char *data);
-	boolean senddata(const char *data);
-	boolean senddata(int data);
  
     int send(const char *data, int timeout = DEFAULT_WAIT_RESPONSE_TIME);
     int send(const uint8_t *data, int len, int timeout = DEFAULT_WAIT_RESPONSE_TIME);
