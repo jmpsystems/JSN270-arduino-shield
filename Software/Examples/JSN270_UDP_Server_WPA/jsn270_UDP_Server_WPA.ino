@@ -5,7 +5,7 @@
 
 #define SSID      "PJW_2G"
 #define KEY       "12345678"
-#define AUTH       "WPA2" 
+#define AUTH       "WPA" 
 
 #define USE_DHCP_IP 1
 
@@ -15,9 +15,8 @@
 #define GATEWAY        "192.168.1.254"
 #endif
 
-#define HOST_IP        "192.168.0.7"
-#define REMOTE_PORT    1234
-#define PROTOCOL       "TCP"
+#define SERVER_PORT    1234
+#define PROTOCOL       "UDP"
 
 SoftwareSerial mySerial(3, 2); // RX, TX
  
@@ -29,7 +28,7 @@ void setup() {
 	mySerial.begin(9600);
 	Serial.begin(9600);
 
-	Serial.println("--------- JSN270 TCP Client with WPA2 Test --------");
+	Serial.println("--------- JSN270 UDP Server with WPA Test --------");
 
 	// wait for initilization of JSN270
 	delay(1000);
@@ -59,7 +58,6 @@ void setup() {
 
 		return;
 	}
-    
 	delay(1000);
 
 	JSN270.sendCommand("at+wstat\r");
@@ -67,7 +65,6 @@ void setup() {
 	while(JSN270.receive((uint8_t *)&c, 1, 100) > 0) {
 		Serial.print((char)c);
 	}
-
 	delay(1000);        
 
 	JSN270.sendCommand("at+nstat\r");
@@ -75,15 +72,15 @@ void setup() {
 	while(JSN270.receive((uint8_t *)&c, 1, 100) > 0) {
 		Serial.print((char)c);
 	}
-
 	delay(1000);
 
-	if (!JSN270.client(HOST_IP, REMOTE_PORT, PROTOCOL)) {
-		Serial.println("Failed connect to " HOST_IP);
+	if (!JSN270.server(SERVER_PORT, PROTOCOL)) {
+		Serial.println("Failed connect ");
 		Serial.println("Restart System");
 	} else {
-		Serial.println("Socket connect to " HOST_IP);
-		delay(2000);
+		Serial.println("Waiting for connection...");
+		delay(1000);
+
 		// Enter data mode
 		JSN270.sendCommand("at+exit\r");
 		delay(5);
@@ -98,3 +95,4 @@ void loop() {
 		JSN270.print((char)Serial.read());
 	}
 }
+

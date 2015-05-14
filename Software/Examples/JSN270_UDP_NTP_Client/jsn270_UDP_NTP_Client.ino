@@ -63,7 +63,6 @@ void setup() {
 
 		return;
 	}
-
 	delay(1000);
     
 	JSN270.sendCommand("at+wstat\r");
@@ -71,7 +70,6 @@ void setup() {
 	while(JSN270.receive((uint8_t *)&c, 1, 100) > 0) {
 		Serial.print((char)c);
 	}
-
 	delay(1000);        
 
 	JSN270.sendCommand("at+nstat\r");
@@ -79,7 +77,6 @@ void setup() {
 	while(JSN270.receive((uint8_t *)&c, 1, 100) > 0) {
 		Serial.print((char)c);
 	}
-
 	delay(1000);
 
 	if (!JSN270.client(HOST_IP, REMOTE_PORT, PROTOCOL)) {
