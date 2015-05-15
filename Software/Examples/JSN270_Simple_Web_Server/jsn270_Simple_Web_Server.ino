@@ -3,9 +3,9 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
-#define SSID      "PJW_2G"		// SSID
-#define KEY       "12345678"	// Passphrase
-#define AUTH       "WPA2" 		// NONE, WEP, WPA, WPA2
+#define SSID      "JSN270_2G"		// your wifi network SSID
+#define KEY       "12345678"		// your wifi network password
+#define AUTH       "WPA2" 		// your wifi network security (NONE, WEP, WPA, WPA2)
 
 #define USE_DHCP_IP 1
 
