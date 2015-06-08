@@ -15,7 +15,7 @@
 #define GATEWAY        "192.168.1.254"
 #endif
 
-#define SERVER_PORT    8080
+#define SERVER_PORT    80
 #define PROTOCOL       "TCP"
 
 int led_status = 0;
