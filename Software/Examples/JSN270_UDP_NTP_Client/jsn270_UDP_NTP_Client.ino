@@ -15,7 +15,7 @@
 #define GATEWAY        "192.168.1.254"
 #endif
 
-#define HOST_IP        "211,233,84,186"
+#define HOST_IP        "211,233,84,186"	// 2.kr.pool.ntp.org
 #define REMOTE_PORT    123
 #define PROTOCOL       "UDP"
 
@@ -29,7 +29,9 @@ JSN270 JSN270(&mySerial);
 
 void setup() {
 	char c;
-
+	String hostname;
+	char hostip[32];
+	
 	mySerial.begin(9600);
 	Serial.begin(9600);
 
@@ -67,35 +69,59 @@ void setup() {
     
 	JSN270.sendCommand("at+wstat\r");
 	delay(5);
-	while(JSN270.receive((uint8_t *)&c, 1, 100) > 0) {
+	while(JSN270.receive((uint8_t *)&c, 1, 1000) > 0) {
 		Serial.print((char)c);
 	}
 	delay(1000);        
 
 	JSN270.sendCommand("at+nstat\r");
 	delay(5);
-	while(JSN270.receive((uint8_t *)&c, 1, 100) > 0) {
+	while(JSN270.receive((uint8_t *)&c, 1, 1000) > 0) {
 		Serial.print((char)c);
 	}
 	delay(1000);
 
-	if (!JSN270.client(HOST_IP, REMOTE_PORT, PROTOCOL)) {
-		Serial.println("Failed connect to " HOST_IP);
+	JSN270.sendCommand("at+nslookup=2.kr.pool.ntp.org\r");
+	delay(5);
+	while(JSN270.receive((uint8_t *)&c, 1, 1000) > 0) {
+		if (c == '[') {
+			break; 
+		}
+		else if ((c != '\r') && (c != '\n')) {
+			if (c >= 32) {	// discard non-printable character
+				hostname += c;
+			}
+		}
+	}
+	delay(1000);
+	
+	Serial.print("NTP Server IP is ");
+	Serial.println(hostname);
+	hostname.toCharArray(hostip, hostname.length()+1);	// convert string to char array
+
+	if (!JSN270.client(hostip, REMOTE_PORT, PROTOCOL)) {
+		Serial.print("Failed connect to ");
+		Serial.println(hostip);
 		Serial.println("Restart System");
 	} else {
-		Serial.println("Socket connect to " HOST_IP);
+		Serial.print("Socket connect to ");
+		Serial.println(hostip);
 		delay(2000);
 	}
 }
 
 void loop() {
+	char c;
+	
 	// Enter data mode
 	JSN270.sendCommand("at+exit\r");
-	delay(1000);
 
+	// consume [OK] message
+	while (JSN270.receive((uint8_t *)&c, 1, 1000) > 0) {
+	}
+        
 	sendNTPpacket(); // send an NTP packet to a time server
 	// wait to see if a reply is available
-	delay(4000);
 
 	if (mySerial.overflow()) {
 		Serial.println("SoftwareSerial overflow!");
@@ -112,17 +138,17 @@ void loop() {
 		unsigned long secsSince1900 = highWord << 16 | lowWord;
 
 		if (secsSince1900) {
-			Serial.print("Seconds since Jan 1 1900 = " );
-			Serial.println(secsSince1900);
+//			Serial.print("Seconds since Jan 1 1900 = " );
+//			Serial.println(secsSince1900);
 
 			// now convert NTP time into everyday time:
-			Serial.print("Unix time = ");
+//			Serial.print("Unix time = ");
 			// Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
 			const unsigned long seventyYears = 2208988800UL;
 			// subtract seventy years:
 			unsigned long epoch = secsSince1900 - seventyYears;
 			// print Unix time:
-			Serial.println(epoch);
+//			Serial.println(epoch);
 
 			epoch = epoch + (3600 * 9);    // Korean time is UTC + 9
 			// print the hour, minute and second:
@@ -145,9 +171,8 @@ void loop() {
 
 	// Enter command mode:
 	JSN270.print("+++");
-	delay(1000);
 	// wait ten seconds before asking for the time again
-	delay(4000);
+	delay(9000);
 }
 
 // send an NTP request to the time server at the given address

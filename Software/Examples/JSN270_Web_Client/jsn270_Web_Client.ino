@@ -65,31 +65,33 @@ void setup() {
 
 	JSN270.sendCommand("at+wstat\r");
 	delay(5);
-	while(JSN270.receive((uint8_t *)&c, 1, 100) > 0) {
+	while(JSN270.receive((uint8_t *)&c, 1, 1000) > 0) {
 		Serial.print((char)c);
 	}
 	delay(1000);        
 
 	JSN270.sendCommand("at+nstat\r");
 	delay(5);
-	while(JSN270.receive((uint8_t *)&c, 1, 100) > 0) {
+	while(JSN270.receive((uint8_t *)&c, 1, 1000) > 0) {
 		Serial.print((char)c);
 	}
 	delay(1000);
 
 	JSN270.sendCommand("at+nslookup=www.google.com\r");
 	delay(5);
-	while(JSN270.receive((uint8_t *)&c, 1, 100) > 0) {
+	while(JSN270.receive((uint8_t *)&c, 1, 1000) > 0) {
 		if (c == '[') {
 			break; 
 		}
 		else if ((c != '\r') && (c != '\n')) {
-			hostname += c;
+			if (c >= 32) {	// discard non-printable character
+				hostname += c;
+			}
 		}
 	}
 	delay(1000);
 	
-	Serial.print("Hostname is ");
+	Serial.print("Host IP is ");
 	Serial.println(hostname);
 	hostname.toCharArray(hostip, hostname.length()+1);	// convert string to char array
 
