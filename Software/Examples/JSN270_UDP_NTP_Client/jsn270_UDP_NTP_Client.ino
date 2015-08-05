@@ -38,7 +38,7 @@ void setup() {
 	Serial.println("--------- JSN270 NTP Client --------");
 
 	// wait for initilization of JSN270
-	delay(1000);
+	delay(5000);
 	//JSN270.reset();
 	delay(1000);
 
