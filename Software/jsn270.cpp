@@ -92,6 +92,109 @@ boolean JSN270::dynamicIP()
 	return false;
 }
 
+// mqtt client
+boolean JSN270::mqtt_set(const char *host, uint16_t port, const char *id, const char *pw, const char *sub_topic, const char *pub_topic)
+{
+	char cmd[MAX_CMD_LEN];
+
+	// broker ip
+	if (host != NULL) {
+		memset(cmd, 0, MAX_CMD_LEN);
+		snprintf(cmd, sizeof(cmd), "at+mqtt_set=0 %s\r", host);
+		sendCommand(cmd,"[OK]");	
+		delay(10);
+	}
+	else {
+		return false;
+	}
+
+	// port
+	if (port != NULL) {
+		memset(cmd, 0, MAX_CMD_LEN);
+		snprintf(cmd, sizeof(cmd), "at+mqtt_set=1 %d\r", port);
+		sendCommand(cmd,"[OK]");	
+		delay(10);
+	}
+	else {
+		return false;
+	}
+
+	// id
+	if (id != NULL) {
+		memset(cmd, 0, MAX_CMD_LEN);
+		snprintf(cmd, sizeof(cmd), "at+mqtt_set=4 %s\r", id);
+		sendCommand(cmd,"[OK]");	
+		delay(10);
+	}
+	else {
+		return false;
+	}
+
+	// pw
+	if (pw != NULL) {
+		memset(cmd, 0, MAX_CMD_LEN);
+		snprintf(cmd, sizeof(cmd), "at+mqtt_set=5 %s\r", pw);
+		sendCommand(cmd,"[OK]");	
+		delay(10);
+	}
+	else {
+		return false;
+	}
+
+	// subscribe topic
+	if (sub_topic != NULL) {
+		memset(cmd, 0, MAX_CMD_LEN);
+		snprintf(cmd, sizeof(cmd), "at+mqtt_set=7 %s\r", sub_topic);
+		sendCommand(cmd,"[OK]");	
+		delay(10);
+	}
+	else {
+		return false;
+	}
+
+	// publish topic
+	if (pub_topic != NULL) {
+		memset(cmd, 0, MAX_CMD_LEN);
+		snprintf(cmd, sizeof(cmd), "at+mqtt_set=6 %s\r", pub_topic);
+		sendCommand(cmd,"[OK]");	
+		delay(10);
+	}
+	else {
+		return false;
+	}
+
+	return true;
+}
+
+// mqtt subscribe
+boolean JSN270::mqtt_sub(void)
+{
+	char cmd[MAX_CMD_LEN];
+
+	snprintf(cmd, sizeof(cmd), "at+mqtt_sub\r");
+	sendCommand(cmd,"[OK]");	
+	delay(10);
+
+	return true;
+}
+
+// mqtt publish
+boolean JSN270::mqtt_pub(const char *message)
+{
+	char cmd[MAX_CMD_LEN];
+
+	if (message != NULL) {
+		snprintf(cmd, sizeof(cmd), "at+mqtt_pub=3 %s\r", message);
+		sendCommand(cmd,"[OK]");	
+		delay(10);
+	}
+	else {
+		return false;
+	}
+
+	return true;
+}
+
 // client
 boolean JSN270::client(const char *host, uint16_t port, const char *protocol)
 {

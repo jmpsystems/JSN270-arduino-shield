@@ -29,6 +29,13 @@ public:
     boolean join(const char *ssid, const char *phrase, const char *auth);
     boolean staticIP(const char *ip, const char *mask, const char *gateway);
     boolean dynamicIP();
+	
+	boolean mqtt_set(const char *host, uint16_t port, const char *id, const char *pw, const char *sub_topic, const char *pub_topic);
+	
+	boolean mqtt_sub(void);
+	
+	boolean mqtt_pub(const char *message);
+
     boolean client(const char *host, uint16_t port, const char *protocol);
     boolean server(uint16_t localport, const char *protocol);
     boolean connected();
